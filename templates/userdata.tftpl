@@ -16,6 +16,11 @@ runcmd:
   - chmod a+x  /usr/local/bin/vault
   - vault -version
   - mkdir -p /vault/raft
+manage-resolv-conf: true
+resolv_conf:
+  nameservers:
+    - 'ns1.digitalocean.com'
+    - 'felipe.cloudflare.com'
 write_files:
   - path: /etc/vault.d/vault.hcl
     content: |
@@ -38,4 +43,3 @@ write_files:
       api_addr = "http://10.110.16.3:8200"
       cluster_addr = "http://104.248.193.9:8201"
       cluster_name = "cluster"
-
