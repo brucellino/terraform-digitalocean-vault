@@ -37,7 +37,5 @@ variable "username" {
 variable "ssh_inbound_source_cidrs" {
   type        = list(any)
   description = "List of CIDRs from which we will allow ssh connections on port 22"
-  default = [
-    "0.0.0.0/0"
-  ]
+  default     = []
 }
