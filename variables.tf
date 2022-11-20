@@ -39,3 +39,10 @@ variable "ssh_inbound_source_cidrs" {
   description = "List of CIDRs from which we will allow ssh connections on port 22"
   default     = []
 }
+
+variable "auto_join_token" {
+  type        = string
+  description = "Digital Ocean autojoin token"
+  default     = ""
+  sensitive   = true
+}

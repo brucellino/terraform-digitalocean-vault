@@ -52,4 +52,5 @@ module "cluster" {
   vpc_name                 = "vault-test"
   project_name             = var.project.name
   ssh_inbound_source_cidrs = ["2.44.137.42"]
+  auto_join_token          = data.vault_kv_secret_v2.do.data["autojoin_token"]
 }

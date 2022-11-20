@@ -114,12 +114,35 @@ resource "digitalocean_droplet" "vault" {
   tags          = ["vault", "auto-destroy"]
   ssh_keys      = [digitalocean_ssh_key.vault.id]
   droplet_agent = true
+  connection {
+    type = "ssh"
+    user = "root"
+    host = self.ipv4_address
+  }
+
+  provisioner "file" {
+    content     = file("${path.module}/templates/vault.service")
+    destination = "/etc/systemd/system/vault.service"
+  }
+  provisioner "remote-exec" {
+    inline = ["mkdir -vp /etc/vault.d"]
+  }
+  provisioner "file" {
+    content = templatefile("${path.module}/templates/vault.tftpl", {
+      region         = data.digitalocean_vpc.vpc.region,
+      tag_name       = "vault",
+      autojoin_token = var.auto_join_token
+      node_id        = "vault-${tostring(count.index)}"
+    })
+    destination = "/etc/vault.d/vault.hcl"
+  }
+
   user_data = (templatefile(
     "${path.module}/templates/userdata.tftpl",
     {
       vault_version = "1.12.1",
       username      = var.username,
-      ssh_pub_key   = data.http.ssh_key.response_body
+      ssh_pub_key   = data.http.ssh_key.response_body,
     }
   ))
   lifecycle {
