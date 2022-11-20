@@ -8,6 +8,10 @@ data "digitalocean_project" "p" {
 
 data "digitalocean_images" "ubuntu" {
   filter {
+    key    = "slug"
+    values = ["ubuntu-22-04-x64"]
+  }
+  filter {
     key    = "distribution"
     values = ["Ubuntu"]
   }
@@ -25,16 +29,16 @@ data "http" "ssh_key" {
   url = var.ssh_public_key_url
 }
 
-resource "digitalocean_domain" "cluster" {
-  name = "test.cluster"
-}
+# resource "digitalocean_domain" "cluster" {
+#   name = "test.cluster"
+# }
 
-resource "digitalocean_record" "lb" {
-  domain = digitalocean_domain.cluster.name
-  type   = "A"
-  name   = "vault"
-  value  = digitalocean_loadbalancer.external.ip
-}
+# resource "digitalocean_record" "lb" {
+#   domain = digitalocean_domain.cluster.name
+#   type   = "A"
+#   name   = "vault"
+#   value  = digitalocean_loadbalancer.external.ip
+# }
 
 # resource "digitalocean_record" "droplets" {
 #   for_each = toset(digitalocean_droplet.vault[*].ipv4_address)
@@ -44,14 +48,14 @@ resource "digitalocean_record" "lb" {
 #   value    = tostring(each.value)
 # }
 
-resource "digitalocean_certificate" "cert" {
-  name    = "vault-external"
-  type    = "lets_encrypt"
-  domains = ["*.test.cluster"]
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+# resource "digitalocean_certificate" "cert" {
+#   name    = "vault-external"
+#   type    = "lets_encrypt"
+#   domains = ["*.test.cluster"]
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 resource "digitalocean_ssh_key" "vault" {
   name       = "Vault ssh key"
@@ -110,14 +114,14 @@ resource "digitalocean_droplet" "vault" {
   tags          = ["vault", "auto-destroy"]
   ssh_keys      = [digitalocean_ssh_key.vault.id]
   droplet_agent = true
-  user_data = templatefile(
+  user_data = (templatefile(
     "${path.module}/templates/userdata.tftpl",
     {
-      vault_version = "1.11.0",
+      vault_version = "1.12.1",
       username      = var.username,
-      ssh_pub_key   = data.http.ssh_key.body
+      ssh_pub_key   = data.http.ssh_key.response_body
     }
-  )
+  ))
   lifecycle {
     create_before_destroy = true
   }
@@ -179,6 +183,10 @@ resource "digitalocean_project_resources" "network" {
 
   resources = [
     digitalocean_loadbalancer.external.urn,
-    digitalocean_domain.cluster.urn
+    # digitalocean_domain.cluster.urn
   ]
+}
+
+output "external_ips" {
+  value = digitalocean_droplet.vault[*].ipv4_address
 }
