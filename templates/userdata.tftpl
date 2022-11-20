@@ -1,21 +1,15 @@
 #cloud-config
-users:
-  - name: ${username}
-    ssh-authorized-keys:
-      - ${ssh_pub_key}
-    shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
 packages:
   - curl
   - jq
   - net-tools
 runcmd:
-  - |
-    curl -fL https://releases.hashicorp.com/vault/${vault_version}/vault_${vault_version}_linux_amd64.zip \
-    | gunzip -> /usr/local/bin/vault
-  - chmod a+x  /usr/local/bin/vault
+  - curl -fL https://releases.hashicorp.com/vault/${vault_version}/vault_${vault_version}_linux_amd64.zip | gunzip -> /usr/local/bin/vault
+  - chmod a+x /usr/local/bin/vault
   - vault -version
   - mkdir -p /vault/raft
+  - mkdir -p /etc/vault.d/
+  - shown -Rvf becker:becker /vault/raft
 manage-resolv-conf: true
 resolv_conf:
   nameservers:
@@ -23,6 +17,7 @@ resolv_conf:
     - 'felipe.cloudflare.com'
 write_files:
   - path: /etc/vault.d/vault.hcl
+    defer: true
     content: |
       storage "raft" {
         path = "/vault/raft"
@@ -36,10 +31,14 @@ write_files:
         tls_disable = true
       }
 
+      listener "tcp" {
+        address = "{{ GetInterfaceIP \"eth0\" }}:8200"
+        tls_disable = true
+      }
       telemetry {
         disable_hostname = false
         prometheus_retention_time = "24h"
       }
-      api_addr = "http://10.110.16.3:8200"
-      cluster_addr = "http://104.248.193.9:8201"
+      api_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8200"
+      cluster_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8201"
       cluster_name = "cluster"
