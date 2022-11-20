@@ -3,42 +3,30 @@ packages:
   - curl
   - jq
   - net-tools
+groups:
+  - vault
+users:
+  - name: vault
+    primary_group: vault
+    groups: vault
 runcmd:
   - curl -fL https://releases.hashicorp.com/vault/${vault_version}/vault_${vault_version}_linux_amd64.zip | gunzip -> /usr/local/bin/vault
   - chmod a+x /usr/local/bin/vault
   - vault -version
   - mkdir -p /vault/raft
-  - mkdir -p /etc/vault.d/
-  - shown -Rvf becker:becker /vault/raft
+  - chown -Rvf vault:vault /etc/vault.d /vault/raft
+  - systemctl daemon-reload
+  - service vault enable
+  - service vault start
+
 manage-resolv-conf: true
 resolv_conf:
   nameservers:
     - 'ns1.digitalocean.com'
     - 'felipe.cloudflare.com'
-write_files:
-  - path: /etc/vault.d/vault.hcl
-    defer: true
-    content: |
-      storage "raft" {
-        path = "/vault/raft"
-      }
-      node_id = ""
-      disable_mlock = true
-      ui = true
-      listener "tcp" {
-        # use go sock addr here
-        address = "127.0.0.1:8200"
-        tls_disable = true
-      }
-
-      listener "tcp" {
-        address = "{{ GetInterfaceIP \"eth0\" }}:8200"
-        tls_disable = true
-      }
-      telemetry {
-        disable_hostname = false
-        prometheus_retention_time = "24h"
-      }
-      api_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8200"
-      cluster_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8201"
-      cluster_name = "cluster"
+final_message: |
+  cloud-init has finished
+  version: $version
+  timestamp: $timestamp
+  datasource: $datasource
+  uptime: $uptime
