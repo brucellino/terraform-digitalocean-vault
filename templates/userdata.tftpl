@@ -3,13 +3,24 @@ packages:
   - curl
   - jq
   - net-tools
+groups:
+  - vault
+users:
+  - name: vault
+    primary_group: vault
+    groups: vault
+    sudo: false
 runcmd:
   - curl -fL https://releases.hashicorp.com/vault/${vault_version}/vault_${vault_version}_linux_amd64.zip | gunzip -> /usr/local/bin/vault
   - chmod a+x /usr/local/bin/vault
   - vault -version
   - mkdir -p /vault/raft
-  - mkdir -p /etc/vault.d/
-  - shown -Rvf becker:becker /vault/raft
+  - mkdir -p /etc/vault.d
+  - chown -Rvf vault:vault /etc/vault.d /vault/raft
+  - systemctl daemon-reload
+  - service vault enable
+  - service vault start
+
 manage-resolv-conf: true
 resolv_conf:
   nameservers:
@@ -17,7 +28,9 @@ resolv_conf:
     - 'felipe.cloudflare.com'
 write_files:
   - path: /etc/vault.d/vault.hcl
-    defer: true
+    permissions: '0664'
+    owner: vault:vault
+    defer: false
     content: |
       storage "raft" {
         path = "/vault/raft"
@@ -32,13 +45,61 @@ write_files:
       }
 
       listener "tcp" {
-        address = "{{ GetInterfaceIP \"eth0\" }}:8200"
+        address = "{{ GetInterfaceIP \"eth1\" }}:8200"
         tls_disable = true
       }
       telemetry {
         disable_hostname = false
         prometheus_retention_time = "24h"
       }
-      api_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8200"
-      cluster_addr = "http://{{ GetInterfaceIP \"eth0\" }}:8201"
+      api_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8200"
+      cluster_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8201"
       cluster_name = "cluster"
+  - path: /etc/systemd/system/vault.service
+    owner: root:root
+    defer: false
+    content: |
+      # See https://medium.com/hashicorp-engineering/systemd-service-file-for-vault-3e339ff86bc6
+      [Unit]
+      Description="HashiCorp Vault - A tool for managing secrets" Documentation=https://www.vaultproject.io/docs/
+      Requires=network-online.target
+      After=network-online.target ConditionFileNotEmpty=/etc/vault.d/vault.hcl StartLimitIntervalSec=60
+      StartLimitBurst=3
+
+      [Service]
+      User=vault
+      Group=vault
+      ProtectSystem=full
+      ProtectHome=read-only
+      PrivateTmp=yes
+      PrivateDevices=yes
+      SecureBits=keep-caps
+      AmbientCapabilities=CAP_IPC_LOCK
+      Capabilities=CAP_IPC_LOCK+ep
+      CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+      NoNewPrivileges=yes
+      Environment="GODEBUG=x509ignoreCN=0"
+      ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl
+      ExecReload=/bin/kill --signal HUP $MAINPID
+      KillMode=process
+      KillSignal=SIGINT
+      Restart=on-failure
+      RestartSec=5
+      TimeoutStopSec=30
+      StartLimitInterval=60
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+      LimitNOFILE=65536
+      LimitMEMLOCK=infinity
+      StandardOutput=append:/var/log/vault.log
+
+      [Install]
+      WantedBy=multi-user.target
+
+
+final_message: |
+  cloud-init has finished
+  version: $version
+  timestamp: $timestamp
+  datasource: $datasource
+  uptime: $uptime
