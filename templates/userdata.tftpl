@@ -16,45 +16,6 @@ runcmd:
   - mkdir -p /vault/raft
   - mkdir -p /etc/vault.d
   - chown -Rvf vault:vault /etc/vault.d /vault/raft
-  - |
-      cat <<EOF
-      # See https://medium.com/hashicorp-engineering/systemd-service-file-for-vault-3e339ff86bc6
-      [Unit]
-      Description="HashiCorp Vault - A tool for managing secrets" Documentation=https://www.vaultproject.io/docs/
-      Requires=network-online.target
-      After=network-online.target ConditionFileNotEmpty=/etc/vault.d/vault.hcl StartLimitIntervalSec=60
-      StartLimitBurst=3
-
-      [Service]
-      User=vault
-      Group=vault
-      ProtectSystem=full
-      ProtectHome=read-only
-      PrivateTmp=yes
-      PrivateDevices=yes
-      SecureBits=keep-caps
-      AmbientCapabilities=CAP_IPC_LOCK
-      Capabilities=CAP_IPC_LOCK+ep
-      CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
-      NoNewPrivileges=yes
-      Environment="GODEBUG=x509ignoreCN=0"
-      ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl
-      ExecReload=/bin/kill --signal HUP $MAINPID
-      KillMode=process
-      KillSignal=SIGINT
-      Restart=on-failure
-      RestartSec=5
-      TimeoutStopSec=30
-      StartLimitInterval=60
-      StartLimitIntervalSec=60
-      StartLimitBurst=3
-      LimitNOFILE=65536
-      LimitMEMLOCK=infinity
-      StandardOutput=append:/var/log/vault.log
-
-      [Install]
-      WantedBy=multi-user.target
-      EOF>/etc/systemd/system/vault.service
   - systemctl daemon-reload
   - service vault enable
   - service vault start
@@ -93,8 +54,46 @@ write_files:
       api_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8200"
       cluster_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8201"
       cluster_name = "cluster"
+  - path: /etc/systemd/system/vault.service
+    owner: root:root
+    defer: false
+    content: |
+      # See https://medium.com/hashicorp-engineering/systemd-service-file-for-vault-3e339ff86bc6
+      [Unit]
+      Description="HashiCorp Vault - A tool for managing secrets" Documentation=https://www.vaultproject.io/docs/
+      Requires=network-online.target
+      After=network-online.target ConditionFileNotEmpty=/etc/vault.d/vault.hcl StartLimitIntervalSec=60
+      StartLimitBurst=3
 
+      [Service]
+      User=vault
+      Group=vault
+      ProtectSystem=full
+      ProtectHome=read-only
+      PrivateTmp=yes
+      PrivateDevices=yes
+      SecureBits=keep-caps
+      AmbientCapabilities=CAP_IPC_LOCK
+      Capabilities=CAP_IPC_LOCK+ep
+      CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+      NoNewPrivileges=yes
+      Environment="GODEBUG=x509ignoreCN=0"
+      ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl
+      ExecReload=/bin/kill --signal HUP $MAINPID
+      KillMode=process
+      KillSignal=SIGINT
+      Restart=on-failure
+      RestartSec=5
+      TimeoutStopSec=30
+      StartLimitInterval=60
+      StartLimitIntervalSec=60
+      StartLimitBurst=3
+      LimitNOFILE=65536
+      LimitMEMLOCK=infinity
+      StandardOutput=append:/var/log/vault.log
 
+      [Install]
+      WantedBy=multi-user.target
 final_message: |
   cloud-init has finished
   version: $version
