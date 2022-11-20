@@ -28,7 +28,7 @@ jobs:
           curl -fSL https://releases.hashicorp.com/consul/1.14.0/consul_1.14.0_linux_amd64.zip \
           | gunzip -> consul ; chmod u+x consul
       - name: Start Consul
-        run: ./consul agent -dev
+        run: nohup ./consul agent -dev &
       - name: Init terraform
         run: ./terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
