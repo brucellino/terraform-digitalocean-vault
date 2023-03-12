@@ -29,33 +29,39 @@ data "http" "ssh_key" {
   url = var.ssh_public_key_url
 }
 
-# resource "digitalocean_domain" "cluster" {
-#   name = "test.cluster"
-# }
+data "vault_kv_secret_v2" "cloudflare" {
+  mount = "cloudflare"
+  name  = "brusisceddu.xyz"
+}
 
-# resource "digitalocean_record" "lb" {
-#   domain = digitalocean_domain.cluster.name
-#   type   = "A"
-#   name   = "vault"
-#   value  = digitalocean_loadbalancer.external.ip
-# }
+resource "tls_private_key" "lb" {
+  algorithm = "RSA"
+}
 
-# resource "digitalocean_record" "droplets" {
-#   for_each = toset(digitalocean_droplet.vault[*].ipv4_address)
-#   domain   = digitalocean_domain.cluster.name
-#   type     = "A"
-#   name     = ""
-#   value    = tostring(each.value)
-# }
+resource "tls_cert_request" "lb" {
+  private_key_pem = tls_private_key.lb.private_key_pem
 
-# resource "digitalocean_certificate" "cert" {
-#   name    = "vault-external"
-#   type    = "lets_encrypt"
-#   domains = ["*.test.cluster"]
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  subject {
+    common_name  = "vault.brusisceddu.xyz"
+    organization = "Cloudflare Managed CA for brucellino"
+  }
+}
+
+resource "cloudflare_origin_ca_certificate" "lb" {
+  # account_id         = data.cloudflare_accounts.example.id
+  csr                = tls_cert_request.lb.cert_request_pem
+  hostnames          = ["vault.brusisceddu.xyz"]
+  request_type       = "origin-rsa"
+  requested_validity = 7
+}
+
+resource "digitalocean_certificate" "cert" {
+  name             = "vault-lb"
+  type             = "custom"
+  private_key      = tls_private_key.lb.private_key_pem
+  leaf_certificate = cloudflare_origin_ca_certificate.lb.certificate
+}
+
 
 resource "digitalocean_ssh_key" "vault" {
   name       = "Vault ssh key"
@@ -73,21 +79,13 @@ resource "digitalocean_loadbalancer" "external" {
   region   = data.digitalocean_vpc.vpc.region
   vpc_uuid = data.digitalocean_vpc.vpc.id
   forwarding_rule {
-    entry_port  = 80
+    entry_port  = 443
     target_port = 8200
     #tfsec:ignore:digitalocean-compute-enforce-https
-    entry_protocol  = "http"
-    target_protocol = "http"
+    entry_protocol   = "https"
+    target_protocol  = "http"
+    certificate_name = digitalocean_certificate.cert.name
   }
-
-
-  # forwarding_rule {
-  #   entry_port       = 443
-  #   target_port      = 8200
-  #   entry_protocol   = "https"
-  #   target_protocol  = "http"
-  #   certificate_name = digitalocean_certificate.cert.name
-  # }
 
   healthcheck {
     # https://www.vaultproject.io/api-docs/system/health
@@ -97,9 +95,29 @@ resource "digitalocean_loadbalancer" "external" {
     check_interval_seconds = 10
     healthy_threshold      = 3
   }
-  droplet_ids = digitalocean_droplet.vault[*].id
-  # redirect_http_to_https = true
+  droplet_ids            = digitalocean_droplet.vault[*].id
+  redirect_http_to_https = true
 }
+
+data "cloudflare_zones" "b" {
+  # account_id = data.cloudflare_accounts.example.id
+  filter {
+    name = "brusisceddu.xyz"
+  }
+}
+
+data "cloudflare_origin_ca_root_certificate" "rsa" {
+  algorithm = "rsa"
+}
+
+resource "cloudflare_record" "vault" {
+  zone_id = data.cloudflare_zones.b.zones[0].id
+  name    = "vault"
+  value   = digitalocean_loadbalancer.external.ip
+  type    = "A"
+  ttl     = 3600
+}
+
 
 resource "digitalocean_droplet" "vault" {
   count         = var.instances
@@ -128,7 +146,7 @@ resource "digitalocean_droplet" "vault" {
     inline = ["mkdir -vp /etc/vault.d"]
   }
   provisioner "file" {
-    content = templatefile("${path.module}/templates/vault.tftpl", {
+    content = templatefile("${path.module}/templates/vault.hcl.tftpl", {
       region         = data.digitalocean_vpc.vpc.region,
       tag_name       = "vault",
       autojoin_token = var.auto_join_token
@@ -137,10 +155,23 @@ resource "digitalocean_droplet" "vault" {
     destination = "/etc/vault.d/vault.hcl"
   }
 
+  provisioner "file" {
+    content     = cloudflare_origin_ca_certificate.lb.certificate
+    destination = "/etc/vault.d/vault-cert.pem"
+  }
+  provisioner "file" {
+    content     = tls_cert_request.lb.private_key_pem
+    destination = "/etc/vault.d/vault-key.pem"
+  }
+  provisioner "file" {
+    content     = data.cloudflare_origin_ca_root_certificate.rsa.cert_pem
+    destination = "/etc/vault.d/vault-ca.pem"
+  }
+
   user_data = (templatefile(
     "${path.module}/templates/userdata.tftpl",
     {
-      vault_version = "1.12.1",
+      vault_version = "1.13.0",
       username      = var.username,
       ssh_pub_key   = data.http.ssh_key.response_body,
     }
@@ -167,22 +198,6 @@ resource "digitalocean_firewall" "ssh" {
     destination_addresses = ["0.0.0.0/0"]
   }
 }
-
-# resource "digitalocean_firewall" "lb" {
-#   name = "web"
-
-#   inbound_rule {
-#     protocol         = "tcp"
-#     port_range       = "443"
-#     source_addresses = ["0.0.0.0/0"]
-#   }
-
-#   outbound_rule {
-#     protocol              = "tcp"
-#     port_range            = "1-65535"
-#     destination_addresses = ["0.0.0.0/0"]
-#   }
-# }
 
 resource "digitalocean_firewall" "vault" {
   name        = "vault"
