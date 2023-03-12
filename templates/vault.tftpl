@@ -1,0 +1,27 @@
+storage "raft" {
+path = "/vault/raft"
+retry_join {
+  auto_join        = "provider=digitalocean region=${region} tag_name=${tag_name} api_token=${autojoin_token}"
+  auto_join_scheme = "http"
+}
+}
+node_id = "${node_id}"
+disable_mlock = true
+ui = true
+listener "tcp" {
+# use go sock addr here
+  address = "127.0.0.1:8200"
+  tls_disable = true
+}
+
+listener "tcp" {
+  address = "{{ GetInterfaceIP \"eth1\" }}:8200"
+  tls_disable = true
+}
+telemetry {
+  disable_hostname = false
+  prometheus_retention_time = "24h"
+}
+api_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8200"
+cluster_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8201"
+cluster_name = "cluster"
