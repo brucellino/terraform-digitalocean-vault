@@ -1,0 +1,31 @@
+storage "raft" {
+  path = "/vault/raft"
+  retry_join {
+    auto_join = "provider=digitalocean region=${region} tag_name=${tag_name} api_token=${autojoin_token}"
+    auto_join_scheme = "http"
+  }
+}
+
+listener "tcp" {
+  address = "127.0.0.1:8200"
+  tls_disable = true
+}
+
+listener "tcp" {
+  address = "{{ GetInterfaceIP \"eth1\" }}:8200"
+  tls_disable = true
+  tls_cert_file      = "/etc/vault.d/vault-cert.pem"
+  tls_key_file       = "/etc/vault.d/vault-key.pem"
+  tls_client_ca_file = "/etc/vault.d/vault-ca.pem"
+}
+telemetry {
+  disable_hostname = false
+  prometheus_retention_time = "24h"
+}
+
+api_addr = "https://{{ GetInterfaceIP \"eth1\" }}:8200"
+cluster_addr = "https://{{ GetInterfaceIP \"eth1\" }}:8201"
+cluster_name = "cluster"
+disable_mlock = true
+node_id = "${node_id}"
+ui = true
