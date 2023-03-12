@@ -38,6 +38,7 @@ resource "tls_private_key" "lb" {
   algorithm = "RSA"
 }
 
+# TLS cert for the load balancer
 resource "tls_cert_request" "lb" {
   private_key_pem = tls_private_key.lb.private_key_pem
 
@@ -115,9 +116,44 @@ resource "cloudflare_record" "vault" {
   name    = "vault"
   value   = digitalocean_loadbalancer.external.ip
   type    = "A"
-  ttl     = 3600
+  ttl     = 1
+  proxied = false
 }
 
+
+resource "tls_private_key" "agent" {
+  count     = var.instances
+  algorithm = "RSA"
+}
+
+resource "tls_cert_request" "agent" {
+  count           = var.instances
+  private_key_pem = tls_private_key.agent[count.index].private_key_pem
+
+  subject {
+    common_name  = "vault-${count.index}.brusisceddu.xyz"
+    organization = "Cloudflare Managed CA for brucellino"
+  }
+  dns_names    = ["vault-${count.index}.brusisceddu.xyz"]
+  ip_addresses = ["127.0.0.1"]
+}
+
+resource "cloudflare_origin_ca_certificate" "agent" {
+  count              = var.instances
+  csr                = tls_cert_request.agent[count.index].cert_request_pem
+  hostnames          = ["vault-${count.index}.brusisceddu.xyz"]
+  request_type       = "origin-rsa"
+  requested_validity = 7
+}
+
+resource "digitalocean_volume" "raft" {
+  count                   = var.instances
+  region                  = data.digitalocean_vpc.vpc.region
+  name                    = "vault-raft-${count.index}"
+  size                    = 10
+  initial_filesystem_type = "ext4"
+  description             = "Vault Raft Data ${count.index}"
+}
 
 resource "digitalocean_droplet" "vault" {
   count         = var.instances
@@ -132,6 +168,7 @@ resource "digitalocean_droplet" "vault" {
   tags          = ["vault", "auto-destroy"]
   ssh_keys      = [digitalocean_ssh_key.vault.id]
   droplet_agent = true
+  volume_ids    = [digitalocean_volume.raft[count.index].id]
   connection {
     type = "ssh"
     user = "root"
@@ -156,11 +193,11 @@ resource "digitalocean_droplet" "vault" {
   }
 
   provisioner "file" {
-    content     = cloudflare_origin_ca_certificate.lb.certificate
+    content     = cloudflare_origin_ca_certificate.agent[count.index].certificate
     destination = "/etc/vault.d/vault-cert.pem"
   }
   provisioner "file" {
-    content     = tls_cert_request.lb.private_key_pem
+    content     = tls_cert_request.agent[count.index].private_key_pem
     destination = "/etc/vault.d/vault-key.pem"
   }
   provisioner "file" {
@@ -174,11 +211,12 @@ resource "digitalocean_droplet" "vault" {
       vault_version = "1.13.0",
       username      = var.username,
       ssh_pub_key   = data.http.ssh_key.response_body,
+      volume_name   = digitalocean_volume.raft[count.index].name
     }
   ))
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "digitalocean_firewall" "ssh" {
@@ -207,7 +245,18 @@ resource "digitalocean_firewall" "vault" {
     protocol                  = "tcp"
     port_range                = "8200-8201"
     source_load_balancer_uids = [digitalocean_loadbalancer.external.id]
+    source_tags               = ["vault"]
   }
+}
+
+resource "digitalocean_domain" "vault" {
+  name       = "vault.brusisceddu.xyz"
+  ip_address = digitalocean_loadbalancer.external.ip
+}
+resource "digitalocean_domain" "agent" {
+  count      = var.instances
+  name       = "vault-${count.index}.brusisceddu.xyz"
+  ip_address = digitalocean_droplet.vault[count.index].ipv4_address
 }
 
 resource "digitalocean_project_resources" "vault_droplets" {
@@ -215,14 +264,16 @@ resource "digitalocean_project_resources" "vault_droplets" {
   resources = digitalocean_droplet.vault[*].urn
 }
 
+resource "digitalocean_project_resources" "raft_volumes" {
+  project   = data.digitalocean_project.p.id
+  resources = digitalocean_volume.raft[*].urn
+}
+
 resource "digitalocean_project_resources" "network" {
 
   project = data.digitalocean_project.p.id
 
-  resources = [
-    digitalocean_loadbalancer.external.urn,
-    # digitalocean_domain.cluster.urn
-  ]
+  resources = [digitalocean_loadbalancer.external.urn]
 }
 
 output "external_ips" {

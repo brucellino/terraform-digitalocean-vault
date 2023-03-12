@@ -13,7 +13,7 @@ listener "tcp" {
 
 listener "tcp" {
   address = "{{ GetInterfaceIP \"eth1\" }}:8200"
-  tls_disable = false
+  tls_disable = true
   tls_cert_file      = "/etc/vault.d/vault-cert.pem"
   tls_key_file       = "/etc/vault.d/vault-key.pem"
   tls_client_ca_file = "/etc/vault.d/vault-ca.pem"
