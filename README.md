@@ -22,7 +22,7 @@ These examples show how to use the module in your project, and are also use for 
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.2.0 |
 | <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | >=4.1.0 |
 | <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | >=2.21.0 |
-| <a name="requirement_http"></a> [http](#requirement\_http) | >=3.2.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.2.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | >=4.0.4 |
 
 ## Providers
@@ -31,7 +31,7 @@ These examples show how to use the module in your project, and are also use for 
 |------|---------|
 | <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | 4.1.0 |
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.26.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | 3.2.1 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.4.0 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.4 |
 | <a name="provider_vault"></a> [vault](#provider\_vault) | 3.13.0 |
 
