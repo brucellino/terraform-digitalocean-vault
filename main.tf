@@ -34,6 +34,10 @@ data "vault_kv_secret_v2" "cloudflare" {
   name  = "brusisceddu.xyz"
 }
 
+data "vault_kv_secret_v2" "do" {
+  mount = var.do_vault_mount
+  name  = "tokens"
+}
 resource "tls_private_key" "lb" {
   algorithm = "RSA"
 }
@@ -186,7 +190,7 @@ resource "digitalocean_droplet" "vault" {
     content = templatefile("${path.module}/templates/vault.hcl.tftpl", {
       region         = data.digitalocean_vpc.vpc.region,
       tag_name       = "vault",
-      autojoin_token = var.auto_join_token
+      autojoin_token = data.vault_kv_secret_v2.do.data["vault_auto_join"]
       node_id        = "vault-${tostring(count.index)}"
     })
     destination = "/etc/vault.d/vault.hcl"
@@ -208,7 +212,7 @@ resource "digitalocean_droplet" "vault" {
   user_data = (templatefile(
     "${path.module}/templates/userdata.tftpl",
     {
-      vault_version = "1.13.0",
+      vault_version = var.vault_version,
       username      = var.username,
       ssh_pub_key   = data.http.ssh_key.response_body,
       volume_name   = digitalocean_volume.raft[count.index].name
@@ -220,7 +224,7 @@ resource "digitalocean_droplet" "vault" {
 }
 
 resource "digitalocean_firewall" "ssh" {
-  name        = "ssh"
+  name        = replace("ssh-vault-${var.project_name}", " ", "-")
   droplet_ids = digitalocean_droplet.vault[*].id
 
   inbound_rule {
@@ -238,7 +242,7 @@ resource "digitalocean_firewall" "ssh" {
 }
 
 resource "digitalocean_firewall" "vault" {
-  name        = "vault"
+  name        = replace("vault-${var.project_name}", " ", "-")
   droplet_ids = digitalocean_droplet.vault[*].id
 
   inbound_rule {
@@ -247,16 +251,6 @@ resource "digitalocean_firewall" "vault" {
     source_load_balancer_uids = [digitalocean_loadbalancer.external.id]
     source_tags               = ["vault"]
   }
-}
-
-resource "digitalocean_domain" "vault" {
-  name       = "vault.brusisceddu.xyz"
-  ip_address = digitalocean_loadbalancer.external.ip
-}
-resource "digitalocean_domain" "agent" {
-  count      = var.instances
-  name       = "vault-${count.index}.brusisceddu.xyz"
-  ip_address = digitalocean_droplet.vault[count.index].ipv4_address
 }
 
 resource "digitalocean_project_resources" "vault_droplets" {

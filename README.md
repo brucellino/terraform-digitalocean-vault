@@ -47,8 +47,6 @@ No modules.
 | [cloudflare_origin_ca_certificate.lb](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/origin_ca_certificate) | resource |
 | [cloudflare_record.vault](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs/resources/record) | resource |
 | [digitalocean_certificate.cert](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/certificate) | resource |
-| [digitalocean_domain.agent](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/domain) | resource |
-| [digitalocean_domain.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/domain) | resource |
 | [digitalocean_droplet.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/droplet) | resource |
 | [digitalocean_firewall.ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
 | [digitalocean_firewall.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
@@ -69,18 +67,21 @@ No modules.
 | [digitalocean_vpc.vpc](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/vpc) | data source |
 | [http_http.ssh_key](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 | [vault_kv_secret_v2.cloudflare](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/kv_secret_v2) | data source |
+| [vault_kv_secret_v2.do](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/kv_secret_v2) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_auto_join_token"></a> [auto\_join\_token](#input\_auto\_join\_token) | Digital Ocean autojoin token | `string` | `""` | no |
+| <a name="input_do_vault_mount"></a> [do\_vault\_mount](#input\_do\_vault\_mount) | Name of the mount where the digital ocean token for autodiscovery is found | `string` | `"digitalocean"` | no |
 | <a name="input_droplet_size"></a> [droplet\_size](#input\_droplet\_size) | Size of the droplet for Vault instances | `string` | `"s-1vcpu-1gb"` | no |
 | <a name="input_instances"></a> [instances](#input\_instances) | number of instances in the vault cluster | `number` | `3` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the project to find | `string` | `"My Project"` | no |
 | <a name="input_ssh_inbound_source_cidrs"></a> [ssh\_inbound\_source\_cidrs](#input\_ssh\_inbound\_source\_cidrs) | List of CIDRs from which we will allow ssh connections on port 22 | `list(any)` | `[]` | no |
 | <a name="input_ssh_public_key_url"></a> [ssh\_public\_key\_url](#input\_ssh\_public\_key\_url) | URL of of the public ssh key to add to the droplet | `string` | `"https://github.com/brucellino.keys"` | no |
 | <a name="input_username"></a> [username](#input\_username) | Name of the non-root user to add | `string` | `"hashiuser"` | no |
+| <a name="input_vault_version"></a> [vault\_version](#input\_vault\_version) | Version of Vault that we want to deploy | `string` | `"1.14.0"` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name of the VPC we are using | `string` | `"My VPC"` | no |
 
 ## Outputs
