@@ -72,6 +72,6 @@ module "cluster" {
   source                   = "../../"
   vpc_name                 = var.vpc_name
   project_name             = var.project.name
-  ssh_inbound_source_cidrs = ["2.44.137.124"]
+  ssh_inbound_source_cidrs = ["2.38.151.8"]
   auto_join_token          = data.vault_kv_secret_v2.do.data["vault_auto_join"]
 }
