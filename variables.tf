@@ -1,3 +1,9 @@
+variable "do_vault_mount" {
+  type        = string
+  description = "Name of the mount where the digital ocean token for autodiscovery is found"
+  default     = "digitalocean"
+}
+
 variable "project_name" {
   type        = string
   description = "Name of the project to find"
@@ -38,6 +44,12 @@ variable "ssh_inbound_source_cidrs" {
   type        = list(any)
   description = "List of CIDRs from which we will allow ssh connections on port 22"
   default     = []
+}
+
+variable "vault_version" {
+  type        = string
+  default     = "1.14.0"
+  description = "Version of Vault that we want to deploy"
 }
 
 variable "auto_join_token" {
