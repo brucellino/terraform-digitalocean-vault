@@ -223,14 +223,20 @@ resource "digitalocean_droplet" "vault" {
   # }
 }
 
+data "http" "ip" {
+  url    = "http://canhazip.com"
+  method = "GET"
+}
+
 resource "digitalocean_firewall" "ssh" {
   name        = replace("ssh-vault-${var.project_name}", " ", "-")
   droplet_ids = digitalocean_droplet.vault[*].id
 
   inbound_rule {
-    protocol         = "tcp"
-    port_range       = "22"
-    source_addresses = var.ssh_inbound_source_cidrs
+    protocol   = "tcp"
+    port_range = "22"
+    # source_addresses = var.ssh_inbound_source_cidrs
+    source_addresses = [chomp(data.http.ip.response_body)]
   }
 
   outbound_rule {
@@ -253,21 +259,9 @@ resource "digitalocean_firewall" "vault" {
   }
 }
 
-resource "digitalocean_project_resources" "vault_droplets" {
+resource "digitalocean_project_resources" "vault" {
   project   = data.digitalocean_project.p.id
-  resources = digitalocean_droplet.vault[*].urn
-}
-
-resource "digitalocean_project_resources" "raft_volumes" {
-  project   = data.digitalocean_project.p.id
-  resources = digitalocean_volume.raft[*].urn
-}
-
-resource "digitalocean_project_resources" "network" {
-
-  project = data.digitalocean_project.p.id
-
-  resources = [digitalocean_loadbalancer.external.urn]
+  resources = flatten([digitalocean_droplet.vault[*].urn, digitalocean_volume.raft[*].urn, digitalocean_loadbalancer.external.urn])
 }
 
 output "external_ips" {

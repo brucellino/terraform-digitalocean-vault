@@ -51,9 +51,7 @@ No modules.
 | [digitalocean_firewall.ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
 | [digitalocean_firewall.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
 | [digitalocean_loadbalancer.external](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/loadbalancer) | resource |
-| [digitalocean_project_resources.network](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
-| [digitalocean_project_resources.raft_volumes](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
-| [digitalocean_project_resources.vault_droplets](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
+| [digitalocean_project_resources.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
 | [digitalocean_ssh_key.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/ssh_key) | resource |
 | [digitalocean_volume.raft](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/volume) | resource |
 | [tls_cert_request.agent](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/cert_request) | resource |
@@ -65,6 +63,7 @@ No modules.
 | [digitalocean_images.ubuntu](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/images) | data source |
 | [digitalocean_project.p](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/project) | data source |
 | [digitalocean_vpc.vpc](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/vpc) | data source |
+| [http_http.ip](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 | [http_http.ssh_key](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
 | [vault_kv_secret_v2.cloudflare](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/kv_secret_v2) | data source |
 | [vault_kv_secret_v2.do](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/kv_secret_v2) | data source |
