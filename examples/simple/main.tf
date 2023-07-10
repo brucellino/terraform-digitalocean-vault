@@ -5,19 +5,19 @@ terraform {
   required_providers {
     vault = {
       source  = "hashicorp/vault"
-      version = "3.11.0"
+      version = "> 3.11"
     }
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = "2.24.0"
+      version = "> 2.24"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "4.0.4"
+      version = "> 4.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.1.0"
+      version = "> 4.1"
     }
   }
 }
