@@ -16,6 +16,18 @@ variable "vpc_name" {
   default     = "My VPC"
 }
 
+variable "region" {
+  type        = string
+  description = "Name of Digital Ocean region we are using."
+  default     = "ams3"
+}
+
+variable "region_from_data" {
+  type        = bool
+  description = "Look up region data from vpc data."
+  default     = false
+}
+
 variable "droplet_size" {
   type        = string
   description = "Size of the droplet for Vault instances"

@@ -81,7 +81,7 @@ resource "digitalocean_ssh_key" "vault" {
 
 resource "digitalocean_loadbalancer" "external" {
   name     = "vault-external"
-  region   = data.digitalocean_vpc.vpc.region
+  region   = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
   vpc_uuid = data.digitalocean_vpc.vpc.id
   forwarding_rule {
     entry_port  = 443
@@ -152,7 +152,7 @@ resource "cloudflare_origin_ca_certificate" "agent" {
 
 resource "digitalocean_volume" "raft" {
   count                   = var.instances
-  region                  = data.digitalocean_vpc.vpc.region
+  region                  = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
   name                    = "vault-raft-${count.index}"
   size                    = 10
   initial_filesystem_type = "ext4"
@@ -163,7 +163,7 @@ resource "digitalocean_droplet" "vault" {
   count         = var.instances
   image         = data.digitalocean_images.ubuntu.images[0].slug
   name          = "vault-${count.index}"
-  region        = data.digitalocean_vpc.vpc.region
+  region        = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
   size          = var.droplet_size
   vpc_uuid      = data.digitalocean_vpc.vpc.id
   ipv6          = false
@@ -188,7 +188,7 @@ resource "digitalocean_droplet" "vault" {
   }
   provisioner "file" {
     content = templatefile("${path.module}/templates/vault.hcl.tftpl", {
-      region         = data.digitalocean_vpc.vpc.region,
+      region         = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
       tag_name       = "vault",
       autojoin_token = data.vault_kv_secret_v2.do.data["vault_auto_join"]
       node_id        = "vault-${tostring(count.index)}"
@@ -218,9 +218,9 @@ resource "digitalocean_droplet" "vault" {
       volume_name   = digitalocean_volume.raft[count.index].name
     }
   ))
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 data "http" "ip" {
