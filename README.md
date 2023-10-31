@@ -77,6 +77,8 @@ No modules.
 | <a name="input_droplet_size"></a> [droplet\_size](#input\_droplet\_size) | Size of the droplet for Vault instances | `string` | `"s-1vcpu-1gb"` | no |
 | <a name="input_instances"></a> [instances](#input\_instances) | number of instances in the vault cluster | `number` | `3` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the project to find | `string` | `"My Project"` | no |
+| <a name="input_region"></a> [region](#input\_region) | Name of Digital Ocean region we are using. | `string` | `"ams3"` | no |
+| <a name="input_region_from_data"></a> [region\_from\_data](#input\_region\_from\_data) | Look up region data from vpc data. | `bool` | `false` | no |
 | <a name="input_ssh_inbound_source_cidrs"></a> [ssh\_inbound\_source\_cidrs](#input\_ssh\_inbound\_source\_cidrs) | List of CIDRs from which we will allow ssh connections on port 22 | `list(any)` | `[]` | no |
 | <a name="input_ssh_public_key_url"></a> [ssh\_public\_key\_url](#input\_ssh\_public\_key\_url) | URL of of the public ssh key to add to the droplet | `string` | `"https://github.com/brucellino.keys"` | no |
 | <a name="input_username"></a> [username](#input\_username) | Name of the non-root user to add | `string` | `"hashiuser"` | no |
