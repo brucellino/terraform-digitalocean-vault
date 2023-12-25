@@ -18,13 +18,13 @@ repos:
     hooks:
       - id: go-fmt
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.85.0
+    rev: v1.86.0
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
       - id: terraform_tfsec
   - repo: https://github.com/terraform-docs/terraform-docs
-    rev: v0.16.0
+    rev: v0.17.0
     hooks:
       - id: terraform-docs-go
         args: ["markdown", "table", "--output-file", "README.md", "."]
