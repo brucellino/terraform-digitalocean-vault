@@ -29,7 +29,7 @@ These examples show how to use the module in your project, and are also use for 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | 4.32.0 |
+| <a name="provider_cloudflare"></a> [cloudflare](#provider\_cloudflare) | 4.33.0 |
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.38.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.4.2 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.0.5 |
