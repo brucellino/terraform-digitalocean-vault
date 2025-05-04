@@ -22,11 +22,11 @@ jobs:
       - name: Get Terraform
         run: |
           wget https://releases.hashicorp.com/terraform/1.11.4/terraform_1.11.4_linux_amd64.zip
-          unzip terraform_1.11.4_linux_amd64.zip
+          unzip -o terraform_1.11.4_linux_amd64.zip
       - name: Get Consul
         run: |
           wget https://releases.hashicorp.com/consul/1.20.0/consul_1.20.0_linux_amd64.zip
-          unzip consul_1.20.0_linux_amd64.zip
+          unzip -o consul_1.20.0_linux_amd64.zip
       - name: Start Consul
         run: nohup ./consul agent -dev &
       - name: Init terraform
