@@ -29,7 +29,7 @@ These examples show how to use the module in your project, and are also use for 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.53.0 |
+| <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.54.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
 | <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.20.0 |
 | <a name="provider_vault"></a> [vault](#provider\_vault) | 3.13.0 |
