@@ -22,6 +22,9 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = ">= 4.1.0"
     }
+    tailscale = {
+      source = "tailscale/tailscale"
+    }
     http = {
       source  = "hashicorp/http"
       version = ">= 3.2.0"

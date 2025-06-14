@@ -47,13 +47,13 @@ No modules.
 | [digitalocean_project_resources.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
 | [digitalocean_ssh_key.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/ssh_key) | resource |
 | [digitalocean_volume.raft](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/volume) | resource |
-| [tailscale_tailnet_key.vault](https://registry.terraform.io/providers/hashicorp/tailscale/latest/docs/resources/tailnet_key) | resource |
+| [tailscale_tailnet_key.vault](https://registry.terraform.io/providers/tailscale/tailscale/latest/docs/resources/tailnet_key) | resource |
 | [vault_token.unseal](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/token) | resource |
 | [digitalocean_images.ubuntu](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/images) | data source |
 | [digitalocean_project.p](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/project) | data source |
 | [digitalocean_vpc.vpc](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/vpc) | data source |
 | [http_http.ssh_key](https://registry.terraform.io/providers/hashicorp/http/latest/docs/data-sources/http) | data source |
-| [tailscale_device.hah_vault](https://registry.terraform.io/providers/hashicorp/tailscale/latest/docs/data-sources/device) | data source |
+| [tailscale_device.hah_vault](https://registry.terraform.io/providers/tailscale/tailscale/latest/docs/data-sources/device) | data source |
 | [vault_kv_secret_v2.do](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/data-sources/kv_secret_v2) | data source |
 
 ## Inputs
