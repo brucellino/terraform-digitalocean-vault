@@ -49,40 +49,6 @@ resource "digitalocean_ssh_key" "vault" {
   }
 }
 
-# resource "cloudflare_origin_ca_certificate" "vault" {
-#   count = var.instances
-#   csr = tls_cert_request.agent[count.index].cert_request_pem
-#   hostnames = ["vault-${count.index}.${var.deploy_zone}"]
-#   request_type = "origin-ecc"
-#   requested_validity = 365
-# }
-
-# resource "tls_private_key" "agent" {
-#   count     = var.instances
-#   algorithm = "RSA"
-# }
-
-# resource "tls_cert_request" "agent" {
-#   count           = var.instances
-#   private_key_pem = tls_private_key.agent[count.index].private_key_pem
-
-#   subject {
-#     common_name  = "vault-${count.index}.brusisceddu.xyz"
-#     organization = "Cloudflare Managed CA for brucellino"
-#   }
-
-#   dns_names    = ["vault-${count.index}.brusisceddu.xyz"]
-#   ip_addresses = ["127.0.0.1"]
-# }
-
-# resource "cloudflare_origin_ca_certificate" "agent" {
-#   count              = var.instances
-#   csr                = tls_cert_request.agent[count.index].cert_request_pem
-#   hostnames          = ["vault-${count.index}.brusisceddu.xyz"]
-#   request_type       = "origin-rsa"
-#   requested_validity = 7
-# }
-
 resource "digitalocean_volume" "raft" {
   count                   = var.instances
   region                  = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
