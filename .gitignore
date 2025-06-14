@@ -32,3 +32,9 @@ override.tf.json
 package-lock.json
 package.json
 node_modules/
+
+*.pem
+*.key
+*.crt
+
+infracost/
