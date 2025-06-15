@@ -93,6 +93,29 @@ resource "vault_token" "unseal" {
   policies     = ["autounseal"]
 }
 
+resource "tls_private_key" "ca" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_self_signed_cert" "ca" {
+  private_key_pem = resource.tls_private_key.ca.private_key_pem
+  subject {
+    common_name         = "Org Root CA"
+    country             = "IT"
+    organization        = "Org"
+    organizational_unit = "Cloud Native Root CA"
+  }
+  allowed_uses = [
+    "cert_signing",
+    "crl_signing",
+    "client_auth",
+    "server_auth",
+    "digital_signature"
+  ]
+  is_ca_certificate     = true
+  validity_period_hours = 8760
+}
 
 resource "digitalocean_droplet" "vault" {
   count         = var.create_instances ? var.instances : 0
@@ -104,7 +127,7 @@ resource "digitalocean_droplet" "vault" {
   ipv6          = false
   backups       = false
   monitoring    = true
-  tags          = ["vault", "auto-destroy"]
+  tags          = ["vault", "auto-destroy", "ssh"]
   ssh_keys      = [digitalocean_ssh_key.vault.id]
   droplet_agent = true
   volume_ids    = [digitalocean_volume.raft[count.index].id]
@@ -121,6 +144,7 @@ resource "digitalocean_droplet" "vault" {
   provisioner "remote-exec" {
     inline = ["mkdir -vp /etc/vault.d"]
   }
+
   provisioner "file" {
     content = templatefile("${path.module}/templates/vault.hcl.tftpl", {
       region                   = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
@@ -136,13 +160,77 @@ resource "digitalocean_droplet" "vault" {
   user_data = (templatefile(
     "${path.module}/templates/userdata.tftpl",
     {
-      vault_version = var.vault_version,
-      username      = var.username,
-      ssh_pub_key   = data.http.ssh_key.response_body,
-      volume_name   = digitalocean_volume.raft[count.index].name
-      tailscale_key = tailscale_tailnet_key.vault.key
+      tailscale_hostname = "vault-${count.index}"
+      vault_version      = var.vault_version,
+      username           = var.username,
+      ssh_pub_key        = data.http.ssh_key.response_body,
+      volume_name        = digitalocean_volume.raft[count.index].name
+      tailscale_key      = tailscale_tailnet_key.vault.key
     }
   ))
+}
+
+# certs depend on instance IPs once assigned
+resource "tls_private_key" "instance" {
+  count     = var.create_instances ? var.instances : 0
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_cert_request" "instance" {
+  count           = var.create_instances ? var.instances : 0
+  private_key_pem = resource.tls_private_key.instance[count.index].private_key_pem
+  subject {
+    common_name         = "vault-${count.index}"
+    country             = "IT"
+    organization        = "Org"
+    organizational_unit = "Cloud Native Root CA"
+  }
+  ip_addresses = ["127.0.0.1", digitalocean_droplet.vault[count.index].ipv4_address, digitalocean_droplet.vault[count.index].ipv4_address_private]
+}
+
+resource "tls_locally_signed_cert" "instance" {
+  count                 = var.create_instances ? var.instances : 0
+  cert_request_pem      = tls_cert_request.instance[count.index].cert_request_pem
+  ca_private_key_pem    = tls_private_key.ca.private_key_pem
+  ca_cert_pem           = tls_self_signed_cert.ca.cert_pem
+  validity_period_hours = 8760
+  allowed_uses          = ["server_auth", "client_auth"]
+}
+
+resource "null_resource" "certs" {
+  count = var.create_instances ? var.instances : 0
+  connection {
+    host        = digitalocean_droplet.vault[count.index].ipv4_address
+    user        = "root"
+    private_key = file("/home/becker/.ssh/id_rsa")
+  }
+
+  provisioner "file" {
+    content     = trimspace(tls_locally_signed_cert.instance[count.index].cert_pem)
+    destination = "/etc/vault.d/vault-cert.pem"
+  }
+
+  provisioner "file" {
+    content     = tls_private_key.instance[count.index].private_key_pem
+    destination = "/etc/vault.d/vault-key.pem"
+  }
+
+  provisioner "file" {
+    content     = tls_self_signed_cert.ca.cert_pem
+    destination = "/etc/vault.d/vault-ca.pem"
+  }
+}
+
+resource "digitalocean_firewall" "ssh" {
+  name        = "ssh-from-home"
+  droplet_ids = [for i in digitalocean_droplet.vault : i.id]
+  tags        = ["ssh"]
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = var.ssh_inbound_source_cidrs
+  }
 }
 
 resource "digitalocean_firewall" "closed" {
@@ -199,8 +287,9 @@ resource "digitalocean_firewall" "closed" {
 }
 
 resource "digitalocean_project_resources" "vault" {
-  project   = data.digitalocean_project.p.id
-  resources = flatten([digitalocean_droplet.vault[*].urn, digitalocean_volume.raft[*].urn])
+  project    = data.digitalocean_project.p.id
+  resources  = flatten([digitalocean_droplet.vault[*].urn, digitalocean_volume.raft[*].urn])
+  depends_on = [digitalocean_volume.raft, digitalocean_droplet.vault]
 }
 
 output "external_ips" {

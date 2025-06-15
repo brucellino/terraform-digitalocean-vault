@@ -31,7 +31,9 @@ These examples show how to use the module in your project, and are also use for 
 |------|---------|
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.55.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 | <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.20.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.1.0 |
 | <a name="provider_vault"></a> [vault](#provider\_vault) | 5.0.0 |
 
 ## Modules
@@ -44,10 +46,17 @@ No modules.
 |------|------|
 | [digitalocean_droplet.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/droplet) | resource |
 | [digitalocean_firewall.closed](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
+| [digitalocean_firewall.ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
 | [digitalocean_project_resources.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/project_resources) | resource |
 | [digitalocean_ssh_key.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/ssh_key) | resource |
 | [digitalocean_volume.raft](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/volume) | resource |
+| [null_resource.certs](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [tailscale_tailnet_key.vault](https://registry.terraform.io/providers/tailscale/tailscale/latest/docs/resources/tailnet_key) | resource |
+| [tls_cert_request.instance](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/cert_request) | resource |
+| [tls_locally_signed_cert.instance](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/locally_signed_cert) | resource |
+| [tls_private_key.ca](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [tls_private_key.instance](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) | resource |
+| [tls_self_signed_cert.ca](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/self_signed_cert) | resource |
 | [vault_token.unseal](https://registry.terraform.io/providers/hashicorp/vault/latest/docs/resources/token) | resource |
 | [digitalocean_images.ubuntu](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/images) | data source |
 | [digitalocean_project.p](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/data-sources/project) | data source |
