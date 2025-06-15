@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: "Pretend you're me"
-        run: mkdir -p /home/becker/.ssh
+        run: sudo mkdir -p /home/becker/.ssh
       - name: "Generate a SSH Key"
         run: ssh-keygen -t rsa -b 4096 -f /home/becker/.ssh/id_rsa -q -N ""
       - name: Checkout code
