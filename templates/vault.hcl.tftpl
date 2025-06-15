@@ -2,7 +2,8 @@ storage "raft" {
   path = "${raft_storage_mount_point}/raft"
   retry_join {
     auto_join = "provider=digitalocean region=${region} tag_name=${tag_name} api_token=${autojoin_token}"
-    auto_join_scheme = "http"
+    auto_join_scheme = "https"
+    leader_ca_cert_file = "/etc/vault.d/vault-ca.pem"
   }
 }
 
@@ -13,12 +14,15 @@ listener "tcp" {
 
 listener "tcp" {
   address = "{{ GetInterfaceIP \"tailscale0\" }}:8200"
-  tls_disable = true
+  tls_disable = false
+  tls_cert_file      = "/etc/vault.d/vault-cert.pem"
+  tls_key_file       = "/etc/vault.d/vault-key.pem"
+  tls_client_ca_file = "/etc/vault.d/vault-ca.pem"
 }
 
 listener "tcp" {
   address = "{{ GetInterfaceIP \"eth1\" }}:8200"
-  tls_disable = true
+  tls_disable = false
   tls_cert_file      = "/etc/vault.d/vault-cert.pem"
   tls_key_file       = "/etc/vault.d/vault-key.pem"
   tls_client_ca_file = "/etc/vault.d/vault-ca.pem"
@@ -29,17 +33,8 @@ telemetry {
   prometheus_retention_time = "24h"
 }
 
-api_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8100"
-cluster_addr = "http://{{ GetInterfaceIP \"eth1\" }}:8201"
+api_addr = "https://{{ GetInterfaceIP \"tailscale0\" }}:8100"
+cluster_addr = "https://{{ GetInterfaceIP \"tailscale0\" }}:8201"
 cluster_name = "do-cluster"
 disable_mlock = true
 ui = true
-
-seal "transit" {
-  token = "${unseal_token}"
-  address = "http://${vault_addr}:8200"
-  disable_renewal = "false"
-  key_name = "autounseal"
-  mount_path = "transit/"
-  tls_skip_verify = "true"
-}
