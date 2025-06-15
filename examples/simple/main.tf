@@ -92,7 +92,8 @@ module "vpc" {
 }
 
 module "cluster" {
-  instances                = 1
+  create_instances         = true
+  instances                = 3
   depends_on               = [module.vpc]
   source                   = "../../"
   vpc_name                 = var.vpc_name
@@ -100,5 +101,6 @@ module "cluster" {
   ssh_inbound_source_cidrs = [local.addr]
   region_from_data         = false
   region                   = "ams3"
+  deploy_zone              = "brusisceddu.xyz"
   auto_join_token          = data.vault_kv_secret_v2.do.data["vault_auto_join"]
 }
