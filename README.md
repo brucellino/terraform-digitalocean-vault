@@ -2,6 +2,8 @@
 
 # Terraform Module Vault on DigitalOcean
 
+This is a Terraform module to deploy a Vault cluster on DigitalOcean
+
 ## Pre-commit hooks
 
 <!-- Edit this section or delete if you make no change  -->
@@ -20,7 +22,6 @@ These examples show how to use the module in your project, and are also use for 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.2.0 |
-| <a name="requirement_cloudflare"></a> [cloudflare](#requirement\_cloudflare) | >= 4.1.0 |
 | <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | >= 2.21.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.2.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 4.0.4 |
