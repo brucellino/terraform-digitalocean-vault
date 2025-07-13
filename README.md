@@ -72,7 +72,6 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_auto_join_token"></a> [auto\_join\_token](#input\_auto\_join\_token) | Digital Ocean autojoin token | `string` | `""` | no |
 | <a name="input_create_instances"></a> [create\_instances](#input\_create\_instances) | Toggle to decide whether to create instances or not | `bool` | `false` | no |
-| <a name="input_deploy_zone"></a> [deploy\_zone](#input\_deploy\_zone) | name of the zone which will be used to deploy the cluster into. This must already exist on cloudflare in your account. | `string` | `"brusisceddu.xyz"` | no |
 | <a name="input_do_vault_mount"></a> [do\_vault\_mount](#input\_do\_vault\_mount) | Name of the mount where the digital ocean token for autodiscovery is found | `string` | `"digitalocean"` | no |
 | <a name="input_droplet_size"></a> [droplet\_size](#input\_droplet\_size) | Size of the droplet for Vault instances | `string` | `"s-2vcpu-2gb"` | no |
 | <a name="input_instances"></a> [instances](#input\_instances) | number of instances in the vault cluster | `number` | `3` | no |

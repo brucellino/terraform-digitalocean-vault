@@ -67,14 +67,6 @@ provider "digitalocean" {
 provider "tailscale" {
   api_key = data.vault_kv_secret_v2.tailscale.data.api_key
 }
-data "vault_kv_secret_v2" "cloudflare" {
-  mount = "cloudflare"
-  name  = "brusisceddu.xyz"
-}
-provider "cloudflare" {
-  api_token = data.vault_kv_secret_v2.cloudflare.data["api_token"]
-}
-
 data "http" "ip" {
   url = "https://api.ipify.org?format=json"
 }
@@ -84,11 +76,12 @@ locals {
 }
 
 module "vpc" {
-  source     = "brucellino/vpc/digitalocean"
-  version    = "2.0.0"
-  project    = var.project
-  vpc_name   = var.vpc_name
-  vpc_region = "ams3"
+  source          = "brucellino/vpc/digitalocean"
+  version         = "2.0.0"
+  project         = var.project
+  vpc_name        = var.vpc_name
+  vpc_region      = "ams3"
+  vpc_description = "Vault VPC"
 }
 
 module "cluster" {
@@ -101,6 +94,5 @@ module "cluster" {
   ssh_inbound_source_cidrs = [local.addr]
   region_from_data         = false
   region                   = "ams3"
-  deploy_zone              = "brusisceddu.xyz"
   auto_join_token          = data.vault_kv_secret_v2.do.data["vault_auto_join"]
 }

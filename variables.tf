@@ -82,9 +82,3 @@ variable "create_instances" {
   default     = false
   description = "Toggle to decide whether to create instances or not"
 }
-
-variable "deploy_zone" {
-  type        = string
-  description = "name of the zone which will be used to deploy the cluster into. This must already exist on cloudflare in your account."
-  default     = "brusisceddu.xyz"
-}
