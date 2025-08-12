@@ -20,7 +20,7 @@ jobs:
       - name: "Generate a SSH Key"
         run: ssh-keygen -t rsa -b 4096 -f /home/becker/.ssh/id_rsa -q -N ""
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Get Terraform
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Setup Node.js
