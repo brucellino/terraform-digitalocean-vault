@@ -1,6 +1,6 @@
 module brucellino/terraform-module-digitalocean-vault
 
-go 1.23.0
+go 1.24.2
 
 require github.com/gruntwork-io/terratest v0.41.3
 

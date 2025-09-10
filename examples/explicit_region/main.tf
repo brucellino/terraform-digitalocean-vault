@@ -70,7 +70,8 @@ module "vpc" {
 module "cluster" {
   depends_on               = [module.vpc]
   source                   = "../../"
-  vault_version            = "1.6.2"
+  instances                = 1
+  vault_version            = "1.15.1"
   vpc_name                 = var.vpc_name
   project_name             = var.project.name
   ssh_inbound_source_cidrs = ["2.38.151.8"]
