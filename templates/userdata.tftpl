@@ -3,6 +3,7 @@ packages:
   - curl
   - jq
   - net-tools
+  - gpg
 groups:
   - vault
 users:
@@ -15,9 +16,10 @@ runcmd:
   - apt-get update
   - apt-get install -y tailscale
   - tailscale up --auth-key=${tailscale_key}
-  - curl -fL https://releases.hashicorp.com/vault/${vault_version}/vault_${vault_version}_linux_amd64.zip | gunzip -> /usr/local/bin/vault
-  - chmod a+x /usr/local/bin/vault
-  - vault -version
+  - wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+  - sudo apt update
+  - sudo apt install -y vault nomad consul
   - mount -o defaults,nofail,discard,noatime /dev/disk/by-id/scsi-DO_Volume_${volume_name} /mnt/vault/
   - mkdir -p /mnt/vault/raft
   - ln -s /mnt/vault /vault

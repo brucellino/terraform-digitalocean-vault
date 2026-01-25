@@ -203,7 +203,7 @@ resource "null_resource" "certs" {
   connection {
     host        = digitalocean_droplet.vault[count.index].ipv4_address
     user        = "root"
-    private_key = file("/home/becker/.ssh/id_rsa")
+    private_key = file(var.ssh_private_key_path)
   }
 
   provisioner "file" {
@@ -295,3 +295,49 @@ resource "digitalocean_project_resources" "vault" {
 output "external_ips" {
   value = digitalocean_droplet.vault[*].ipv4_address
 }
+
+# A resource to wait for droplet destruction
+# resource "terraform_data" "wait_for_droplet_destroy" {
+#   depends_on = [
+#     digitalocean_droplet.vault,
+#     digitalocean_volume.raft,
+#     digitalocean_firewall.ssh,
+#     digitalocean_firewall.closed
+#   ]
+
+#   provisioner "local-exec" {
+#     when    = destroy
+#     interpreter = [ "/bin/bash", "-c" ]
+#     command = <<-EOT
+#       echo "Waiting for droplets and volumes to be fully removed..."
+#       for i in $(seq 1 60); do
+#         # Check droplets with tag
+#         DROPLETS=$(curl -s -X GET \
+#           -H "Authorization: Bearer ${self.triggers_replace.do_token}" \
+#           "https://api.digitalocean.com/v2/droplets?tag_name=vault" | \
+#           grep -o '"droplets":\[' | wc -l)
+
+#         # Check volumes in region
+#         VOLUMES=$(curl -s -X GET \
+#           -H "Authorization: Bearer ${self.triggers_replace.do_token}" \
+#           "https://api.digitalocean.com/v2/volumes?region=${self.triggers_replace.region}" | \
+#           grep -c 'vault-raft' || echo "0")
+
+#         if [ "$DROPLETS" -eq "0" ] && [ "$VOLUMES" -eq "0" ]; then
+#           echo "All resources destroyed"
+#           exit 0
+#         fi
+
+#         echo "Waiting for resources... Droplets: $DROPLETS, Volumes: $VOLUMES (attempt $i/60)"
+#         sleep 3
+#       done
+
+#       echo "Timeout waiting for resources to be destroyed"
+#       exit 1
+#     EOT
+#   }
+#   triggers_replace = {
+#      do_token = data.vault_kv_secret_v2.do.data["vault_auto_join"]
+#      region   = var.region_from_data ? data.digitalocean_vpc.vpc.region : var.region
+#     }
+# }

@@ -82,3 +82,9 @@ variable "create_instances" {
   default     = false
   description = "Toggle to decide whether to create instances or not"
 }
+
+variable "ssh_private_key_path" {
+  type        = string
+  description = "Path to the private ssh key to use for provisioning"
+  default     = "~/.ssh/id_rsa"
+}

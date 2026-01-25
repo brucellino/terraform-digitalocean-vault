@@ -80,6 +80,7 @@ No modules.
 | <a name="input_region"></a> [region](#input\_region) | Name of Digital Ocean region we are using. | `string` | `"ams3"` | no |
 | <a name="input_region_from_data"></a> [region\_from\_data](#input\_region\_from\_data) | Look up region data from vpc data. | `bool` | `false` | no |
 | <a name="input_ssh_inbound_source_cidrs"></a> [ssh\_inbound\_source\_cidrs](#input\_ssh\_inbound\_source\_cidrs) | List of CIDRs from which we will allow ssh connections on port 22 | `list(any)` | `[]` | no |
+| <a name="input_ssh_private_key_path"></a> [ssh\_private\_key\_path](#input\_ssh\_private\_key\_path) | Path to the private ssh key to use for provisioning | `string` | `"~/.ssh/id_rsa"` | no |
 | <a name="input_ssh_public_key_url"></a> [ssh\_public\_key\_url](#input\_ssh\_public\_key\_url) | URL of of the public ssh key to add to the droplet | `string` | `"https://github.com/brucellino.keys"` | no |
 | <a name="input_username"></a> [username](#input\_username) | Name of the non-root user to add | `string` | `"hashiuser"` | no |
 | <a name="input_vault_version"></a> [vault\_version](#input\_vault\_version) | Version of Vault that we want to deploy | `string` | `"1.19.3"` | no |
