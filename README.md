@@ -20,7 +20,7 @@ These examples show how to use the module in your project, and are also use for 
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >1.2.0 |
 | <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | >= 2.21.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.2.0 |
@@ -29,7 +29,7 @@ These examples show how to use the module in your project, and are also use for 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.73.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
@@ -44,7 +44,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [digitalocean_droplet.vault](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/droplet) | resource |
 | [digitalocean_firewall.closed](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
 | [digitalocean_firewall.ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
@@ -69,7 +69,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_auto_join_token"></a> [auto\_join\_token](#input\_auto\_join\_token) | Digital Ocean autojoin token | `string` | `""` | no |
 | <a name="input_create_instances"></a> [create\_instances](#input\_create\_instances) | Toggle to decide whether to create instances or not | `bool` | `false` | no |
 | <a name="input_do_vault_mount"></a> [do\_vault\_mount](#input\_do\_vault\_mount) | Name of the mount where the digital ocean token for autodiscovery is found | `string` | `"digitalocean"` | no |
@@ -89,7 +89,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_droplet_ip_addresses"></a> [droplet\_ip\_addresses](#output\_droplet\_ip\_addresses) | n/a |
 | <a name="output_external_ips"></a> [external\_ips](#output\_external\_ips) | n/a |
 <!-- END_TF_DOCS -->
