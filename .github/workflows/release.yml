@@ -1,4 +1,8 @@
 name: main
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
 on:
   push:
     branches:
@@ -13,30 +17,26 @@ jobs:
         example:
           - simple
     name: validate
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: "Pretend you're me"
         run: sudo mkdir -p /home/becker/.ssh
       - name: "Generate a SSH Key"
         run: ssh-keygen -t rsa -b 4096 -f /home/becker/.ssh/id_rsa -q -N ""
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Get Terraform
-        run: |
-          wget https://releases.hashicorp.com/terraform/1.11.4/terraform_1.11.4_linux_amd64.zip
-          unzip -o terraform_1.11.4_linux_amd64.zip
-      - name: Get Consul
-        run: |
-          wget https://releases.hashicorp.com/consul/1.20.0/consul_1.20.0_linux_amd64.zip
-          unzip -o consul_1.20.0_linux_amd64.zip
+      - name: Dev tools
+        uses: jdx/mise-action@v5
+        with:
+          install: true
       - name: Start Consul
-        run: nohup ./consul agent -dev &
+        run: nohup consul agent -dev &
       - name: Init terraform
-        run: ./terraform -chdir=examples/${{ matrix.example }} init
+        run: terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
-        run: ./terraform -chdir=examples/${{ matrix.example }} validate
+        run: terraform -chdir=examples/${{ matrix.example }} validate
   release:
     needs:
       - validate
@@ -44,21 +44,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@7
         with:
           fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Build Env
+        uses: jdx/mise-action@v5
         with:
-          node-version: "lts/*"
-      - name: Install dependencies
-        run: |
-          npm install -D '@semantic-release/commit-analyzer' \
-          '@semantic-release/release-notes-generator' \
-          '@semantic-release/changelog' \
-          'semantic-release-license' \
-          '@semantic-release/github'
+          install: true
+        env:
+          MISE_ENV: release
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MISE_ENV: release
         run: npx semantic-release

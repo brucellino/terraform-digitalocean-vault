@@ -1,0 +1,13 @@
+[env]
+
+[tools]
+node = "26"
+
+[tasks.install_deps]
+description = "Install semantic release dependencies"
+run = "npm install --save-dev @semantic-release/git @semantic-release/exec '@semantic-release/release-notes-generator' '@semantic-release/changelog' 'semantic-release-license' '@semantic-release/github'"
+
+[tasks.release]
+depends = ["install_deps"]
+description = "Create a semantic release"
+run = "npx semantic-release"

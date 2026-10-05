@@ -37,4 +37,4 @@ node_modules/
 *.key
 *.crt
 
-infracost/
+.infracost/
