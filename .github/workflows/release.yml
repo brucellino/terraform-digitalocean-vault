@@ -32,7 +32,7 @@ jobs:
         with:
           install: true
       - name: Start Consul
-        run: nohup consul agent -dev & && sleep 3
+        run: nohup consul agent -dev & sleep 3
       - name: Init terraform
         run: terraform -chdir=examples/${{ matrix.example }} init
       - name: Validate terraform
