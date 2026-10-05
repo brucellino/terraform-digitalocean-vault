@@ -12,18 +12,19 @@ terraform {
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
-      version = ">= 2.21.0"
+      version = "~> 2"
     }
     tls = {
       source  = "hashicorp/tls"
-      version = ">= 4.0.4"
+      version = "~> 4"
     }
     tailscale = {
-      source = "tailscale/tailscale"
+      source  = "tailscale/tailscale"
+      version = "~> 0.29"
     }
     http = {
       source  = "hashicorp/http"
-      version = ">= 3.2.0"
+      version = "~> 3"
     }
   }
 
