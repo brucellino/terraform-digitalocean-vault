@@ -1,4 +1,5 @@
 [tools]
 prek = "0.5.5"
-go = "1.25"
+go = "1.27.1"
 terraform = "1.16"
+consul = "2.0.4"
