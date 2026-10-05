@@ -16,7 +16,7 @@ terraform {
     }
     tls = {
       source  = "hashicorp/tls"
-      version = "~> 4"
+      version = ">= 4"
     }
     tailscale = {
       source  = "tailscale/tailscale"
