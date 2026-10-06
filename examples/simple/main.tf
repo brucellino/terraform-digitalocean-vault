@@ -12,10 +12,12 @@ terraform {
       version = "~> 2"
     }
     http = {
-      source = "hashicorp/http"
+      source  = "hashicorp/http"
+      version = "~> 3"
     }
     tailscale = {
-      source = "tailscale/tailscale"
+      source  = "tailscale/tailscale"
+      version = "~> 0.29"
     }
     tls = {
       source  = "hashicorp/tls"
