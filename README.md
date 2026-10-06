@@ -25,7 +25,7 @@ These examples show how to use the module in your project, and are also use for 
 | <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | >= 2 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 3 |
 | <a name="requirement_tailscale"></a> [tailscale](#requirement\_tailscale) | ~> 0.29 |
-| <a name="requirement_tls"></a> [tls](#requirement\_tls) | ~> 4 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 4 |
 
 ## Providers
 
@@ -33,10 +33,10 @@ These examples show how to use the module in your project, and are also use for 
 | ---- | ------- |
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.104.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.6.2 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
-| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.20.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.1.0 |
-| <a name="provider_vault"></a> [vault](#provider\_vault) | 5.0.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.3.2 |
+| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.29.2 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 4.4.1 |
+| <a name="provider_vault"></a> [vault](#provider\_vault) | 5.12.0 |
 
 ## Modules
 
