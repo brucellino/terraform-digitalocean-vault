@@ -34,7 +34,7 @@ These examples show how to use the module in your project, and are also use for 
 | <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.106.0 |
 | <a name="provider_http"></a> [http](#provider\_http) | 3.6.2 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.3.2 |
-| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.29.2 |
+| <a name="provider_tailscale"></a> [tailscale](#provider\_tailscale) | 0.29.3 |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | 4.4.2 |
 | <a name="provider_vault"></a> [vault](#provider\_vault) | 5.12.0 |
 
